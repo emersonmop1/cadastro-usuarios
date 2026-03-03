@@ -1,7 +1,8 @@
 
 import './App.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import UserCard from './components/UserCard'
+import axios from 'axios'
 
 // Componente do React é ASSIM
 // 1) Função (Código muitoooo antigos, pode ser uma classe)
@@ -19,20 +20,31 @@ function App() {
   const [age, setAge] = useState(33)
   const [users, setUsers] = useState([])
 
+  useEffect(() => {
+
+    async function buscarUsuarios() {
+      const resposta = await axios.get('https://api.gestordevclub.com/usuarios')
+
+      setUsers(resposta.data)
+    }
+
+    buscarUsuarios()
+  }, [])
+
+
+
+
   // 1) Variavel em si, que eu pego o valor dela
   // 2) (set) uma funcao para colocar o valor dentro da variavel
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
 
-    const newUser = {
-      id: Date.now(),
-      name,
+    await axios.post('https://api.gestordevclub.com//usuarios', {
+      nome: name,
       email,
-      age,
-    }
-
-    setUsers([...users, newUser])
+      idade: age
+    })
   }
 
 
@@ -69,11 +81,19 @@ function App() {
       </form>
 
       <div className='user-list'>
-        
+
         {users.map((user) => (
-           <UserCard key={user.id} user={user}/>
+          <UserCard key={user._id} user={user} />
         ))}
+
+        {/* CORS
+          Cross-Origin Resource Sharing 
+          (Compartilhamento de Recursos entre Origens Diferentes, em português).
         
+
+          BACK END - BLOQUEIA ACESSOS DE OUTROS ENDEREÇOS POR SEGURANÇA
+        */}
+
       </div>
 
     </div>
